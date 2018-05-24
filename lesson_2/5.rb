@@ -4,8 +4,6 @@
 # Алгоритм опредления високосного года: www.adm.yar.ru
 #
 
-
-
 def leap?(year)
   # Год високосный, если он делится на четыре без остатка, но если он делится на 100 без остатка, это не високосный год.
   # Однако, если он делится без остатка на 400, это високосный год.
@@ -19,11 +17,11 @@ def order(day, month, year)
   months[1] = 29 if leap? year
 
   if month <= 0 || month > 12
-    return "задана неправильная дата"
+    return 'задана неправильная дата'
   end
 
   if day <= 0 || day > months[month - 1]
-    return "задана неправильная дата"
+    return 'задана неправильная дата'
   end
 
   days_before_this_month = 0
@@ -37,13 +35,13 @@ def order(day, month, year)
   days_before_this_month + day
 end
 
-puts "День?"
+puts 'День?'
 user_day = gets.chomp.to_i
 
-puts "Месяц?"
+puts 'Месяц?'
 user_month = gets.chomp.to_i
 
-puts "Год?"
+puts 'Год?'
 user_year = gets.chomp.to_i
 
 puts order user_day, user_month, user_year
