@@ -18,13 +18,12 @@ class Station
 
   def arrive(train)
     unless @trains_list.include? train
-      @trains_list.push train
-      train.move_to_station(self)
+      @trains_list << train
     end
   end
 
   def departure(train)
-    if @trains_list.include? train && train.go_next
+    if @trains_list.include? train
       @trains_list.delete_if { |current_train| current_train == train }
     end
   end

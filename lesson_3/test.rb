@@ -32,7 +32,7 @@ end
 def test_train(route)
   puts '=====================', 'Тестируем класс Train', '====================='
   puts 'Создаем поезд'
-  train = Train.new('Раменское - Москва', 'passenger', 1)
+  train = Train.new('Раменское - Москва', 'passenger')
   puts train, '---'
   puts "Сейчас в этом поезде вагонов #{train.wagons}", '---'
   puts 'Прицепляем вагон'
@@ -60,33 +60,35 @@ def test_train(route)
   puts 'Отправим поезд на следующую станцию'
   train.go_next
   puts "Поезд находится на станции #{train.station.name}", '---'
-  puts 'Отправим поезд на прелылущую станцию'
+  puts 'Отправим поезд на предыдущую станцию'
   puts "Поезд находится на станции #{train.station.name}", '---'
   train.go_back
   puts ''
   train
 end
 
-def test_stations(train)
+def test_stations(route)
   puts '=====================', 'Тестируем класс Station', '====================='
-  puts 'Смотрим на какой станции находится поезд'
-  current_station = train.station
-  puts current_station, current_station.name, '---'
-  puts 'Посмотрим список поездов на текущей станции'
-  puts current_station.trains_list, '---'
-  puts 'Отправим поезд со станции управляя станцией'
-  current_station.departure current_station.trains_list[0]
-  puts 'Смотрим на какой станции находится поезд теперь'
-  puts train.station, train.station.name, '---'
-  puts 'Найдем  станцию на которой теперь поезд, и посмотрим список ПАССАЖИРСКИХ поездов'
-  current_station = train.station
-  puts current_station.trains_list('passenger'), '---'
-  puts 'Отправим единственный из списка пассажирских поездов на текущей станции поездов на конечную'
-  puts train.route.stations.last.arrive train
+  puts 'Создаем поезда и прикрепляем к ним маршрут'
+  passenger_train = Train.new('Раменское - Москва', 'passenger', 1)
+  freight_train = Train.new('Раменское - Москва', 'freight', 55)
+  passenger_train.route = route
+  freight_train.route = route
+  puts '---'
+  puts 'проверяем, что все поезда на первой станции'
+  puts route.stations[0].trains_list, '---'
+  puts 'выведем список грузовых поездов'
+  puts route.stations[0].trains_list('freight'), '---'
+  puts 'отправим единственный грузовой поезд и снова выведем список грузовых поездов. Убедимся что он теперь пуст!'
+  freight_train.go_next
+  puts route.stations[0].trains_list('freight'), '---'
+  puts 'Вернем грузовой поезд назад и убедимся что он снова в списке поездов на станции'
+  freight_train.go_back
+  puts route.stations[0].trains_list('freight'), '---'
 end
 
 route = test_route
 
 train = test_train route
 
-test_stations train
+test_stations route

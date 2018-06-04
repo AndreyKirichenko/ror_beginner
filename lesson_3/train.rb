@@ -15,14 +15,9 @@
 # Возвращать предыдущую станцию, текущую, следующую, на основе маршрута
 
 class Train
-  attr_reader :number
-  attr_reader :route
-  attr_reader :speed
-  attr_reader :station
-  attr_reader :type
-  attr_reader :wagons
+  attr_reader :number, :route, :speed, :station, :type, :wagons
 
-  def initialize(number, type, wagons)
+  def initialize(number, type, wagons = 0)
     @number = number
     @speed = 0
     @type = type
@@ -47,16 +42,15 @@ class Train
   end
 
   def remove_wagon
-    if speed.zero?
-      @wagons -= 1
-    else
+    unless speed.zero?
       puts 'Вагон не может быть удален. Поезд движется'
-      false
+      return false
     end
 
-    if @wagons <= 0
-      puts 'В поезде остался единственный вагон, отцеплять нечего'
-      @wagons = 1
+    if @wagons == 0
+      puts 'В поезде не осталось вагонов'
+    else
+      @wagons -= 1
     end
   end
 
@@ -66,6 +60,10 @@ class Train
   end
 
   def move_to_station(station)
+    if @station
+      @station.departure self
+    end
+
     return puts "Маршрут не задан. Движение не возможно" unless @route
     if @station == station
       puts "поезд уже находится на станции #{station.name}"
