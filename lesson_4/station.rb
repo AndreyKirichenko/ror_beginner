@@ -23,8 +23,8 @@ class Station
       when 'passenger'
         return @trains_list.select { |train| train.type == 'passenger'}
 
-      when 'freight'
-        return @trains_list.select { |train| train.type == 'freight'}
+      when 'cargo'
+        return @trains_list.select { |train| train.type == 'cargo'}
 
       else
         return @trains_list

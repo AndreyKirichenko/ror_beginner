@@ -1,11 +1,10 @@
 class Train
   attr_reader :number, :route, :speed, :station, :type, :wagons
 
-  def initialize(number, type, wagons = 0)
+  def initialize(number)
     @number = number
     @speed = 0
-    @type = type
-    @wagons = wagons
+    @wagons = 0
   end
 
   def accelerate(speed)
@@ -16,7 +15,7 @@ class Train
     @speed = 0
   end
 
-  def add_wagon
+  def add_wagon wagon
     if speed.zero?
       @wagons += 1
     else
