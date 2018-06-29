@@ -4,7 +4,7 @@ class Train
   def initialize(number)
     @number = number
     @speed = 0
-    @wagons = 0
+    @wagons = []
   end
 
   def accelerate(speed)
@@ -15,9 +15,10 @@ class Train
     @speed = 0
   end
 
-  def add_wagon wagon
+  def add_wagon(wagon = 'Вагон неизвестного типа')
     if speed.zero?
-      @wagons += 1
+      @wagons.push wagon
+      puts 'Вагон добавлен'
     else
       puts 'Вагон не может быть добавлен. Поезд движется'
       false
@@ -30,10 +31,11 @@ class Train
       return false
     end
 
-    if @wagons == 0
+    if @wagons.size == 0
       puts 'В поезде не осталось вагонов'
     else
-      @wagons -= 1
+      @wagons.pop
+      puts 'Вагон отцеплен'
     end
   end
 

@@ -1,5 +1,7 @@
 class Menu
   def ask(list)
+    return -1 if list.empty?
+
     show list
 
     inputed_index = gets.chomp.to_i - 1

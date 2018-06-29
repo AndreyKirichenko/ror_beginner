@@ -1,5 +1,4 @@
 class Route
-  attr_accessor :intermediate_stations
   attr_reader :first_station, :last_station
 
   def initialize(first_station, last_station)
@@ -9,7 +8,7 @@ class Route
   end
 
   def add(station)
-    intermediate_stations.push(station)
+    intermediate_stations.push(station).uniq! { |station| station.object_id }
   end
 
   def remove_by_name(station_name)
@@ -21,10 +20,14 @@ class Route
   end
 
   def stations
-    [first_station, last_station].insert(1, *intermediate_stations)
+    [first_station, last_station].insert(1, *intermediate_stations).uniq { |station| station.object_id }
   end
 
   def name
     first_station.name + ' - ' + last_station.name
   end
+
+  private
+
+  attr_accessor :intermediate_stations
 end
