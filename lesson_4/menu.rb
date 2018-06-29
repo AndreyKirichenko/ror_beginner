@@ -15,6 +15,8 @@ class Menu
   end
 
   def show(list)
+    return -1 if list.empty?
+
     list.each_index do |index|
       puts "#{index + 1} - #{list[index]}"
     end

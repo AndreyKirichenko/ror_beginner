@@ -67,14 +67,10 @@ class Main
     system 'clear'
     header 'Список всех  станций'
 
-    if stations.empty?
-      system 'clear'
-      continue 'Список станций пуст'
-    else
-      Menu.new.show(stations.map { |station| station.name })
-      continue
-    end
+    result = Menu.new.show(stations.map { |station| station.name })
 
+    return if process_menu_empty result, :stations_menu, 'Список станций пуст'
+    continue
     stations_menu
   end
 
@@ -83,6 +79,8 @@ class Main
     header(header)
 
     index = Menu.new.ask(stations.map { |station| station.name })
+
+    return if process_menu_empty index, :stations_menu, 'Список станций пуст'
 
     send(callback_method_name, index) unless callback_method_name.nil?
 
@@ -173,13 +171,9 @@ class Main
     system 'clear'
     header 'Список всех существующих поездов'
 
-    if trains.empty?
-      system 'clear'
-      continue 'Список поездов пуст'
-    else
-      Menu.new.show(trains.map { |train| train.number + ' - ' + train.type })
-      continue
-    end
+    result = Menu.new.show(trains.map { |train| train.number + ' - ' + train.type })
+    return if process_menu_empty result, :trains_menu, 'Список поездов пуст'
+    continue
 
     trains_menu
   end
@@ -189,6 +183,8 @@ class Main
     header(header)
 
     index = Menu.new.ask(trains.map { |train| train.number + ' - ' + train.type })
+
+    return if process_menu_empty index, :trains_menu, 'Список поездов пуст'
 
     send(callback_method_name, index) unless callback_method_name.nil?
 
@@ -273,13 +269,8 @@ class Main
     system 'clear'
     header 'Список всех существующих маршрутов'
 
-    if routes.empty?
-      system 'clear'
-      continue 'Список маршрутов пуст'
-    else
-      Menu.new.show(routes.map { |route| route.name })
-      continue
-    end
+    result = Menu.new.show(routes.map { |route| route.name })
+    return if process_menu_empty result, :routes_menu, 'Список маршрутов пуст'
 
     routes_menu
   end
@@ -292,6 +283,8 @@ class Main
     name = gets.chomp
 
     station_1_index = choose_station(nil, 'Выберите станцию начала маршрута')
+    return if process_menu_empty station_1_index, :routes_menu, 'Список станций пуст'
+
     station_2_index = choose_station(nil, 'Выберите станцию окончания маршрута')
 
     routes << Route.new(stations[station_1_index], stations[station_2_index])
@@ -306,6 +299,8 @@ class Main
     header(header)
 
     index = Menu.new.ask(routes.map { |route| route.name })
+
+    return if process_menu_empty index, :routes_menu, 'Список маршрутов пуст'
 
     send(callback_method_name, index) unless callback_method_name.nil?
   end
@@ -351,6 +346,7 @@ class Main
     header 'Добавление станции в маршрут'
 
     station_index = choose_station(nil, 'Выберите станцию для добавления в маршрут')
+    return if process_menu_empty station_index, :stations_menu, 'список станций пуст'
 
     route = routes[route_index]
     station = stations[station_index]
@@ -366,28 +362,37 @@ class Main
     system 'clear'
     header 'Добавление маршрута к поезду'
     train_index = choose_train
+    return if process_menu_empty train_index, :routes_menu, 'Список поездов пуст'
 
     train = trains[train_index]
 
     train.route = routes[route_index]
 
     continue "Маршрут #{routes[route_index].name} добавлен к поезду #{train.number}"
+
     routes_menu
   end
 
   def choose_in_menu(list)
     index = Menu.new.ask(list.map { |item| item[0] })
 
-    if index.nil?
-      continue 'Чтото пошло не так'
-      exit
-    end
+    return if process_menu_empty index, :main_menu
 
     if list[index][2].nil?
       send(list[index][1])
     else
       send(list[index][1], list[index][2])
     end
+  end
+
+  def process_menu_empty(index, callback, header = 'список пуст')
+    if index == -1
+      continue header
+      send callback
+      return true
+    end
+
+    false
   end
 
   def header(str = '')
