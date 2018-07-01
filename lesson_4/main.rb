@@ -212,42 +212,61 @@ class Main
   def train_go_next(index)
     system 'clear'
 
-    trains[index].go_next
+    train = trains[index]
 
-    continue
+    if train.go_next
+      continue 'Осторожно, двери закрываются'
+    else
+      continue 'Поезд не может ехать дальше'
+    end
+
     train_menu index
   end
 
   def train_go_back(index)
     system 'clear'
 
-    trains[index].go_back
+    train = trains[index]
 
-    continue
+    if train.go_back
+      continue 'Осторожно, двери закрываются'
+    else
+      continue 'Поезд не может ехать дальше'
+    end
+
     train_menu index
   end
 
   def add_wagon(index)
     system 'clear'
 
-    trains[index].add_wagon
+    train = trains[index]
 
-    continue
+    if train.add_wagon
+      continue 'Вагон добален'
+    else
+      continue 'Вагон не может быть добавлен'
+    end
     train_menu index
   end
 
   def remove_wagon(index)
     system 'clear'
 
-    trains[index].remove_wagon
+    train = trains[index]
 
-    continue
+    if train.remove_wagon
+      continue 'Вагон отцеплен'
+    else
+      continue 'Вагон не может быть отцеплен'
+    end
     train_menu index
   end
 
   def remove_train(index)
     system 'clear'
     trains.delete_at index
+    continue 'Поезд удален'
     trains_menu
   end
 
@@ -401,7 +420,7 @@ class Main
 
   def continue(str = '')
     header str unless str.empty?
-    puts '', 'для прожолжения нажмите Enter'
+    puts '', 'для продолжения нажмите Enter'
     gets
   end
 

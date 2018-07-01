@@ -21,10 +21,10 @@ class Station
   def trains(type = '')
     case type
       when 'passenger'
-        return @trains.select { |train| train.type == 'passenger'}
+        return @trains.select { |train| train.instance_of? PassengerTrain}
 
       when 'cargo'
-        return @trains.select { |train| train.type == 'cargo'}
+        return @trains.select { |train| train.instance_of? == CargoTrain}
 
       else
         return @trains

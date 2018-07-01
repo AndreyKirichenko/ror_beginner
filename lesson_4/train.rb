@@ -15,28 +15,26 @@ class Train
     @speed = 0
   end
 
-  def add_wagon(wagon = 'Вагон неизвестного типа')
+  def add_wagon(wagon = '')
     if speed.zero?
       @wagons.push wagon
-      puts 'Вагон добавлен'
+      true
     else
-      puts 'Вагон не может быть добавлен. Поезд движется'
       false
     end
   end
 
   def remove_wagon
     unless speed.zero?
-      puts 'Вагон не может быть удален. Поезд движется'
       return false
     end
 
-    if @wagons.size == 0
-      puts 'В поезде не осталось вагонов'
-    else
+    unless @wagons.size.zero?
       @wagons.pop
-      puts 'Вагон отцеплен'
+      return true
     end
+
+    false
   end
 
   def route=(route)
@@ -47,11 +45,10 @@ class Train
   def go_next
     current_index = route.stations.index @station
     next_index = current_index + 1
+
     if next_index >= route.stations.size
-      puts 'Поезд находится на конечной станции и дальше двигаться некуда'
       false
     else
-      puts "Осторожно, двери закрываются. Следующая станция #{route.stations[next_index].name}"
       move_to_station route.stations[next_index]
       true
     end
@@ -60,11 +57,10 @@ class Train
   def go_back
     current_index = route.stations.index @station
     next_index = current_index - 1
+
     if next_index < 0
-      puts 'Поезд находится на начальной станции и назад двигаться некуда'
       false
     else
-      puts "Осторожно, двери закрываются. Следующая станция #{route.stations[next_index].name}"
       move_to_station route.stations[next_index]
       true
     end
@@ -77,13 +73,15 @@ class Train
       @station.departure self
     end
 
-    return puts "Маршрут не задан. Движение не возможно" unless @route
+    return false unless @route
+
     if @station == station
-      puts "поезд уже находится на станции #{station.name}"
       return false
     end
+
     @station = station
     @station.arrive self
+
     true
   end
 end
