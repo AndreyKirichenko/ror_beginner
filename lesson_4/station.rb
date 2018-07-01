@@ -24,7 +24,7 @@ class Station
         return @trains.select { |train| train.instance_of? PassengerTrain}
 
       when 'cargo'
-        return @trains.select { |train| train.instance_of? == CargoTrain}
+        return @trains.select { |train| train.instance_of? CargoTrain}
 
       else
         return @trains
