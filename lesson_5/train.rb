@@ -3,7 +3,7 @@ require_relative 'instance_counter'
 
 class Train
   attr_reader :number, :route, :speed, :station, :type, :wagons
-  @@instances = []
+  @@instances = {}
 
   include Manufacturer
   include InstanceCounter
@@ -11,16 +11,15 @@ class Train
 
   def initialize(number)
     puts 'Train init'
-    register_instance
-
+    instance_count
+    @@instances[number] = self
     @number = number
     @speed = 0
     @wagons = []
   end
 
   def self.find(number)
-    selected = @@instances.select { |instance| instance.number == number }
-    selected[0]
+    @@instances[number]
   end
 
   def accelerate(speed)

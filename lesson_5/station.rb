@@ -7,7 +7,8 @@ class Station
   include InstanceCounter
 
   def initialize(name)
-    register_instance
+    instance_count
+    @@instances << self
     @trains = []
     @name = name
   end

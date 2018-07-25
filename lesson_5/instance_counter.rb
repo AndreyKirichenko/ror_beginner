@@ -6,19 +6,19 @@ module InstanceCounter
   end
 
   module ClassMethods
-    attr_accessor :instances
+    attr_accessor :instance_counter
 
     def instances_amount
-      instances.size
+      instance_counter
     end
   end
 
   module InstanceMethods
     protected
 
-    def register_instance
-      self.class.instances ||= []
-      self.class.instances << self
+    def instance_count
+      self.class.instance_counter ||= 0
+      self.class.instance_counter += 1
     end
   end
 end
