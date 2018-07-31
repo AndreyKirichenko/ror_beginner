@@ -1,10 +1,11 @@
 require_relative 'instance_counter'
 
 class Route
-  attr_reader :first_station, :last_station
-  @@instances = []
-
   include InstanceCounter
+
+  attr_reader :first_station, :last_station
+
+  @@instances = []
 
   def initialize(first_station, last_station)
     instance_count
@@ -33,7 +34,8 @@ class Route
     first_station.name + ' - ' + last_station.name
   end
 
-  private
+  protected
 
   attr_accessor :intermediate_stations
+
 end

@@ -1,7 +1,11 @@
+require_relative 'station'
+require_relative 'route'
 require_relative 'manufacturer'
 require_relative 'instance_counter'
 
 class Train
+  NUMBER_FORMAT = /^[[:alnum:]]{3}-{0,1}[[:alnum:]]{2}$/i
+
   attr_reader :number, :route, :speed, :station, :type, :wagons
   @@instances = {}
 
@@ -10,12 +14,20 @@ class Train
 
 
   def initialize(number)
-    puts 'Train init'
+    puts validate!(number)
+
     instance_count
+
     @@instances[number] = self
     @number = number
     @speed = 0
     @wagons = []
+  end
+
+  def valid?(number)
+    validate! number
+  rescue RuntimeError
+    false
   end
 
   def self.find(number)
@@ -82,6 +94,13 @@ class Train
   end
 
   private
+
+  def validate!(number)
+    raise 'Вы не ввели номер поезда' if number.empty?
+    raise 'Недопустимое название поезда' if number !~ NUMBER_FORMAT
+    raise "Поезд с номером #{number} уже существует" unless self.class.find(number).nil?
+    true
+  end
 
   def move_to_station(station)
     if @station

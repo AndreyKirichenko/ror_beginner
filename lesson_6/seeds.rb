@@ -14,8 +14,8 @@ class Seeds
     stations << Station.new('Сортировочная')
     stations << Station.new('Москва Казанская')
 
-    trains << PassengerTrain.new('Спутник Раменское - Москва')
-    trains << CargoTrain.new('Краснодар - Москва сортировочная')
+    trains << PassengerTrain.new('qw2-11')
+    trains << CargoTrain.new('33q-33')
 
     routes << Route.new(stations[0], stations.last)
     routes << Route.new(stations[1], stations.last)

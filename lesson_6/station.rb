@@ -1,16 +1,29 @@
 require_relative 'instance_counter'
 
 class Station
+  include InstanceCounter
+
+  NAME_FORMAT = /^([[:alnum:]]||\s)+$/i
+
   attr_reader :name
 
   @@instances = []
-  include InstanceCounter
 
   def initialize(name)
+    validate! name
+
     instance_count
+
     @@instances << self
+
     @trains = []
     @name = name
+  end
+
+  def valid?(name)
+    validate! name
+  rescue RuntimeError
+    false
   end
 
   def self.all
@@ -40,5 +53,13 @@ class Station
       else
         return @trains
     end
+  end
+
+  protected
+
+  def validate!(name)
+    raise 'Вы не ввели название' if name.empty?
+    raise 'Недопустимое название' if name !~ NAME_FORMAT
+    true
   end
 end

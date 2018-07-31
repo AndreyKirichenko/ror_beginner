@@ -56,7 +56,13 @@ class Main
 
     name = gets.chomp
 
-    stations << Station.new(name)
+    begin
+      stations << Station.new(name)
+    rescue RuntimeError => e
+      system 'clear'
+      continue e.message
+      create_station
+    end
 
     system 'clear'
     continue "Cтанция \"#{name}\" добавлена"
@@ -132,14 +138,21 @@ class Main
     choose_in_menu list
   end
 
-  def create_train
+  def create_train(train_class = nil)
+    train_class = choose_train_type if train_class.nil?
     system 'clear'
     header 'Создание нового поезда'
     puts 'Введите номер нового поезда'
 
     number = gets.chomp
 
-    choose_train_type.new(number)
+    begin
+      trains << train_class.new(number)
+    rescue RuntimeError => e
+      system 'clear'
+      continue e.message
+      create_train train_class
+    end
 
     system 'clear'
     continue "Поезд \"#{number}\" добавлен"
@@ -289,7 +302,10 @@ class Main
     header 'Список всех существующих маршрутов'
 
     result = Menu.new.show(routes.map { |route| route.name })
+
     return if process_menu_empty result, :routes_menu, 'Список маршрутов пуст'
+
+    continue
 
     routes_menu
   end
@@ -297,9 +313,6 @@ class Main
   def create_route
     system 'clear'
     header 'Создание нового маршрута'
-
-    puts 'Введите название нового маршрута'
-    name = gets.chomp
 
     station_1_index = choose_station(nil, 'Выберите станцию начала маршрута')
     return if process_menu_empty station_1_index, :routes_menu, 'Список станций пуст'
@@ -309,7 +322,7 @@ class Main
     routes << Route.new(stations[station_1_index], stations[station_2_index])
 
     system 'clear'
-    continue "Маршрут \"#{name}\" создан"
+    continue "Маршрут создан"
     routes_menu
   end
 
@@ -406,6 +419,7 @@ class Main
 
   def process_menu_empty(index, callback, header = 'список пуст')
     if index == -1
+      system 'clear'
       continue header
       send callback
       return true
@@ -430,11 +444,9 @@ class Main
   end
 
   def seeds
-    system 'clear'
     Seeds.new.generate(routes, stations, trains)
-
-    #Я так и не понял почему тут has_seeds не виден без @
     @has_seeds = true
+    system 'clear'
     continue 'Демо-данные сгенерированы'
     main_menu
   end
