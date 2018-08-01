@@ -4,7 +4,7 @@ require_relative 'passenger_wagon'
 class PassengerTrain < Train
   def initialize(number)
     super(number)
-    @type = 'passenger'
+    @type = 'Пассажирский'
   end
 
   def add_wagon

@@ -14,18 +14,18 @@ class Train
 
 
   def initialize(number)
-    puts validate!(number)
+    @number = number
+    @speed = 0
+    @wagons = []
+    validate!
 
     instance_count
 
     @@instances[number] = self
-    @number = number
-    @speed = 0
-    @wagons = []
   end
 
-  def valid?(number)
-    validate! number
+  def valid?
+    validate!
   rescue RuntimeError
     false
   end
@@ -95,10 +95,14 @@ class Train
 
   private
 
-  def validate!(number)
-    raise 'Вы не ввели номер поезда' if number.empty?
+  def validate!
+    validate_number!
+  end
+
+  def validate_number!
+    raise 'Вы не ввели номер поезда' if @number.empty?
     raise 'Недопустимое название поезда' if number !~ NUMBER_FORMAT
-    raise "Поезд с номером #{number} уже существует" unless self.class.find(number).nil?
+    raise "Поезд с номером #{@number} уже существует" unless self.class.find(@number).nil?
     true
   end
 

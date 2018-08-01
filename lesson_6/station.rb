@@ -10,18 +10,18 @@ class Station
   @@instances = []
 
   def initialize(name)
-    validate! name
+    @name = name
+    @trains = []
+
+    validate!
 
     instance_count
 
     @@instances << self
-
-    @trains = []
-    @name = name
   end
 
-  def valid?(name)
-    validate! name
+  def valid?
+    validate!
   rescue RuntimeError
     false
   end
@@ -44,10 +44,10 @@ class Station
 
   def trains(type = '')
     case type
-      when 'passenger'
+      when 'Пассажирский'
         return @trains.select { |train| train.instance_of? PassengerTrain}
 
-      when 'cargo'
+      when 'Грузовой'
         return @trains.select { |train| train.instance_of? CargoTrain}
 
       else
@@ -57,9 +57,9 @@ class Station
 
   protected
 
-  def validate!(name)
-    raise 'Вы не ввели название' if name.empty?
-    raise 'Недопустимое название' if name !~ NAME_FORMAT
+  def validate!
+    raise 'Вы не ввели название' if @name.empty?
+    raise 'Недопустимое название' if @name !~ NAME_FORMAT
     true
   end
 end
