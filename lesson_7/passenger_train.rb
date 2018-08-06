@@ -7,7 +7,7 @@ class PassengerTrain < Train
     @type = 'Пассажирский'
   end
 
-  def add_wagon
-    super(PassengerWagon.new)
+  def add_wagon(amount)
+    super(PassengerWagon.new(amount))
   end
 end

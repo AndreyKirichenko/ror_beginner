@@ -55,6 +55,10 @@ class Station
     end
   end
 
+  def process_trains
+    @trains.each { |train| yield(train)}
+  end
+
   protected
 
   def validate!

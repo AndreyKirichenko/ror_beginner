@@ -24,6 +24,7 @@ class Main
     header 'Главное меню'
 
     list = [
+      ['Информация о всей железной дороге', :stations_menu],
       ['Станции', :stations_menu],
       ['Поезда', :trains_menu],
       ['Маршруты', :routes_menu],

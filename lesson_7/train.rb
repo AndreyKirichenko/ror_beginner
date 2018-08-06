@@ -93,6 +93,10 @@ class Train
     end
   end
 
+  def process_wagons
+    @wagons.each { |wagon| yield(wagon)}
+  end
+
   private
 
   def validate!
