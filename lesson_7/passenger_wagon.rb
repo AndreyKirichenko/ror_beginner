@@ -7,6 +7,7 @@ class PassengerWagon < Wagon
     super()
     @amount = amount
     @taken = 0
+    @type = 'Пассажирский'
   end
 
   def take

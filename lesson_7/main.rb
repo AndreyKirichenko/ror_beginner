@@ -24,7 +24,7 @@ class Main
     header 'Главное меню'
 
     list = [
-      ['Информация о всей железной дороге', :stations_menu],
+      ['Общая статистика', :common_info],
       ['Станции', :stations_menu],
       ['Поезда', :trains_menu],
       ['Маршруты', :routes_menu],
@@ -34,6 +34,35 @@ class Main
     list << ['Сгенерировать демо-данные', :seeds] unless has_seeds
 
     choose_in_menu list
+  end
+
+  def common_info
+    system 'clear'
+    header 'Общая статистика'
+
+    @stations.each do |station|
+      subheader "Станция #{station.name}"
+
+      station.process_trains do |train|
+        puts "Поезд номер: #{train.number}"
+        puts "Тип поезда #{train.type}"
+        puts "Вагонов #{train.wagons_amount}"
+        puts ''
+        puts 'Подробнее о составе'
+
+        train.process_wagons do |wagon, index|
+          puts "Вагон №#{index}, "
+
+        end
+      end
+    end
+
+    continue
+
+  end
+
+  def statistics
+
   end
 
   def stations_menu
@@ -430,7 +459,18 @@ class Main
   end
 
   def header(str = '')
-    puts "==== #{str} =====", ''
+    header_decorator(str)
+    puts ''
+  end
+
+  def subheader(str = '')
+    header_decorator(str, '-')
+  end
+
+  def header_decorator(str, line_char = '=')
+    line = ''
+    str.length.times { line += '=' }
+    puts str, line
   end
 
   def continue(str = '')

@@ -38,7 +38,9 @@ class Seeds
 
   def generate_cargo_train
     train = CargoTrain.new(generate_train_number)
-    train.add_wagon(Random.rand(CARGO_WAGONS_MIN...CARGO_WAGONS_MAX))
+    amount = Random.rand(CARGO_WAGONS_MIN...CARGO_WAGONS_MAX)
+    amount.times { train.add_wagon() }
+
     train
   end
 

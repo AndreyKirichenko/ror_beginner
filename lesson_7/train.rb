@@ -64,6 +64,10 @@ class Train
     false
   end
 
+  def wagons_amount
+    @wagons.size
+  end
+
   def route=(route)
     @route = route
     move_to_station route.stations[0]
@@ -94,7 +98,7 @@ class Train
   end
 
   def process_wagons
-    @wagons.each { |wagon| yield(wagon)}
+    @wagons.each_index { |index| yield(@wagons[index], index)}
   end
 
   private

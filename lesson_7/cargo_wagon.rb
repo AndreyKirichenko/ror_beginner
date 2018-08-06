@@ -6,6 +6,7 @@ class CargoWagon < Wagon
   def initialize(max_volume)
     @max_volume = max_volume
     @loaded = 0
+    @type = 'Грузовой'
   end
 
   def load(volume)
