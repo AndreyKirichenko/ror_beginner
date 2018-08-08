@@ -1,3 +1,4 @@
+require_relative './terminal_helpers'
 require_relative './menu'
 require_relative './route'
 require_relative './station'
@@ -6,6 +7,7 @@ require_relative './passenger_train'
 require_relative './seeds'
 
 class Main
+  include TerminalHelpers
   attr_accessor :routes, :stations, :trains, :has_seeds
 
   def initialize
@@ -20,7 +22,7 @@ class Main
   private
 
   def main_menu
-    system 'clear'
+    clear
     header 'Главное меню'
 
     list = [
@@ -37,7 +39,7 @@ class Main
   end
 
   def common_info
-    system 'clear'
+    clear
     header 'Общая статистика'
 
     @stations.each do |station|
@@ -48,25 +50,29 @@ class Main
         puts "Тип поезда #{train.type}"
         puts "Вагонов #{train.wagons_amount}"
         puts ''
-        puts 'Подробнее о составе'
+        puts 'Подробнее о составе:' unless train.wagons_amount.zero?
 
         train.process_wagons do |wagon, index|
-          puts "Вагон №#{index}, "
-
+          str = "Вагон №#{index}"
+          case train.class.to_s
+          when 'PassengerTrain'
+            str += ", свободных мест #{wagon.available}, занято мест #{wagon.taken}, вместимость #{wagon.amount}"
+          when 'CargoTrain'
+            str += ", свободно #{wagon.available}, загружено #{wagon.loaded}, вместимость #{wagon.max_volume}"
+          end
+          puts str
         end
+        puts ''
       end
+      puts '', ''
     end
 
     continue
-
-  end
-
-  def statistics
-
+    main_menu
   end
 
   def stations_menu
-    system 'clear'
+    clear
     header 'Станции'
 
     list = [
@@ -80,7 +86,7 @@ class Main
   end
 
   def create_station
-    system 'clear'
+    clear
     header 'Создание новой станции'
     puts 'Введите название для новой станции'
 
@@ -89,18 +95,18 @@ class Main
     begin
       stations << Station.new(name)
     rescue RuntimeError => e
-      system 'clear'
+      clear
       continue e.message
       create_station
     end
 
-    system 'clear'
+    clear
     continue "Cтанция \"#{name}\" добавлена"
     stations_menu
   end
 
   def all_stations
-    system 'clear'
+    clear
     header 'Список всех  станций'
 
     result = Menu.new.show(stations.map { |station| station.name })
@@ -111,7 +117,7 @@ class Main
   end
 
   def choose_station(callback_method_name = nil, header = 'Выбрать станцию')
-    system 'clear'
+    clear
     header(header)
 
     index = Menu.new.ask(stations.map { |station| station.name })
@@ -124,7 +130,7 @@ class Main
   end
 
   def station_menu index
-    system 'clear'
+    clear
     station = stations[index]
 
     header "Станция #{station.name}"
@@ -139,13 +145,13 @@ class Main
   end
 
   def remove_station(index)
-    system 'clear'
+    clear
     stations.delete_at index
     stations_menu
   end
 
   def trains_at_station(index)
-    system 'clear'
+    clear
     header 'Список поездов на станции'
 
     Menu.new.show(stations[index].trains.map { |train| train.number + ' - ' + train.type })
@@ -155,7 +161,7 @@ class Main
   end
 
   def trains_menu
-    system 'clear'
+    clear
     header 'Поезда'
 
     list = [
@@ -170,7 +176,7 @@ class Main
 
   def create_train(train_class = nil)
     train_class = choose_train_type if train_class.nil?
-    system 'clear'
+    clear
     header 'Создание нового поезда'
     puts 'Введите номер нового поезда'
 
@@ -179,12 +185,12 @@ class Main
     begin
       trains << train_class.new(number)
     rescue RuntimeError => e
-      system 'clear'
+      clear
       continue e.message
       create_train train_class
     end
 
-    system 'clear'
+    clear
     continue "Поезд \"#{number}\" добавлен"
 
     trains_menu
@@ -199,7 +205,7 @@ class Main
   end
 
   def choose_train_type
-    system 'clear'
+    clear
     header 'Выбор типа поезда'
 
     list = [
@@ -211,7 +217,7 @@ class Main
   end
 
   def all_trains
-    system 'clear'
+    clear
     header 'Список всех существующих поездов'
 
     result = Menu.new.show(trains.map { |train| train.number + ' - ' + train.type })
@@ -222,7 +228,7 @@ class Main
   end
 
   def choose_train(callback_method_name = nil, header = 'Выбрать поезд')
-    system 'clear'
+    clear
     header(header)
 
     index = Menu.new.ask(trains.map { |train| train.number + ' - ' + train.type })
@@ -235,7 +241,7 @@ class Main
   end
 
   def train_menu(index)
-    system 'clear'
+    clear
     train = trains[index]
 
     header "Поезд \"#{train.number}\""
@@ -245,6 +251,7 @@ class Main
       ['Ехать назад', :train_go_back, index],
       ['Прицепить вагон', :add_wagon, index],
       ['Отцепить вагон', :remove_wagon, index],
+      ['Выбрать вагон', :choose_wagon, index],
       ['Удалить поезд', :remove_train, index],
       ['Вернуться в меню поездов', :trains_menu]
     ]
@@ -253,7 +260,7 @@ class Main
   end
 
   def train_go_next(index)
-    system 'clear'
+    clear
 
     train = trains[index]
 
@@ -267,7 +274,7 @@ class Main
   end
 
   def train_go_back(index)
-    system 'clear'
+    clear
 
     train = trains[index]
 
@@ -281,11 +288,29 @@ class Main
   end
 
   def add_wagon(index)
-    system 'clear'
-
+    clear
+    header 'Добавление нового вагона'
     train = trains[index]
 
-    if train.add_wagon
+    max = 0
+    loaded = 0
+
+    case train.class.to_s
+    when 'CargoTrain'
+      puts 'Введите максимальный объем'
+      max = gets.chomp.to_f
+      puts 'Введите загруженность'
+      loaded = gets.chomp.to_f
+    when 'PassengerTrain'
+      puts 'Введите число мест'
+      max = gets.chomp.to_f
+      puts 'Введите число пассажиров'
+      loaded = gets.chomp.to_f
+    end
+
+    clear
+
+    if train.add_wagon(max, loaded)
       continue 'Вагон добален'
     else
       continue 'Вагон не может быть добавлен'
@@ -294,7 +319,7 @@ class Main
   end
 
   def remove_wagon(index)
-    system 'clear'
+    clear
 
     train = trains[index]
 
@@ -307,14 +332,85 @@ class Main
   end
 
   def remove_train(index)
-    system 'clear'
+    clear
     trains.delete_at index
     continue 'Поезд удален'
     trains_menu
   end
 
+  def choose_wagon(train_index)
+    train = trains[train_index]
+    amount = train.wagons.length
+    clear
+
+    if amount.zero?
+      continue 'В этом поезде нет вагонов'
+      train_menu train_index
+    else
+      header("Выберете вагон c 1 по #{amount}")
+      wagon_index = gets.chomp.to_f - 1
+      wagon_loading(train.wagons[wagon_index], train_index)
+    end
+
+    continue
+  end
+
+  def wagon_loading(wagon, train_index)
+    clear
+    case wagon.class.to_s
+      when 'CargoWagon'
+        cargo_wagon_loading(wagon, train_index)
+      when 'PassengerWagon'
+        passenger_wagon_loading(wagon, train_index)
+    end
+  end
+
+  def cargo_wagon_loading(wagon, train_index)
+    clear
+    header "Укажите сколько загрузить. Доступно #{wagon.available}"
+
+    volume = gets.chomp.to_f
+    begin
+      wagon.load(volume)
+    rescue RuntimeError => e
+      continue e.message
+      cargo_wagon_loading(wagon, train_index)
+    end
+    train_menu train_index
+  end
+
+  def passenger_wagon_loading(wagon, train_index)
+    clear
+    header "Добавьте или уберите пассажира. Свободно мест #{wagon.available}"
+
+    list = [
+      ['Добавить пассажира', :passenger_wagon_take, { wagon: wagon, train_index: train_index}],
+      ['Убрать пассажира', :passenger_wagon_vacate, { wagon: wagon, train_index: train_index}]
+    ]
+
+    choose_in_menu list
+  end
+
+  def passenger_wagon_take(arguments)
+    begin
+      arguments[:wagon].take
+    rescue RuntimeError => e
+      continue e.message
+      passenger_wagon_loading(arguments.wagon, arguments.train_index)
+    end
+  end
+
+  def passenger_wagon_vacate(arguments)
+    begin
+      arguments[:wagon].vacate
+    rescue RuntimeError => e
+      continue e.message
+      passenger_wagon_loading(arguments.wagon, arguments.train_index)
+    end
+  end
+
   def routes_menu
-    system 'clear'
+    clear
     header 'Маршруты'
 
     list = [
@@ -328,7 +424,7 @@ class Main
   end
 
   def all_routes
-    system 'clear'
+    clear
     header 'Список всех существующих маршрутов'
 
     result = Menu.new.show(routes.map { |route| route.name })
@@ -341,7 +437,7 @@ class Main
   end
 
   def create_route
-    system 'clear'
+    clear
     header 'Создание нового маршрута'
 
     station_1_index = choose_station(nil, 'Выберите станцию начала маршрута')
@@ -351,13 +447,13 @@ class Main
 
     routes << Route.new(stations[station_1_index], stations[station_2_index])
 
-    system 'clear'
+    clear
     continue "Маршрут создан"
     routes_menu
   end
 
   def choose_route(callback_method_name = nil, header = 'Выбор маршрута')
-    system 'clear'
+    clear
     header(header)
 
     index = Menu.new.ask(routes.map { |route| route.name })
@@ -368,7 +464,7 @@ class Main
   end
 
   def route_menu(index)
-    system 'clear'
+    clear
     route = routes[index]
 
     header "Маршрут #{route.name}"
@@ -385,7 +481,7 @@ class Main
   end
 
   def remove_route(index)
-    system 'clear'
+    clear
     name = routes[index].name
     routes.delete_at index
 
@@ -394,7 +490,7 @@ class Main
   end
 
   def stations_in_route(index)
-    system 'clear'
+    clear
     header 'Список всех  станций'
 
     Menu.new.show(routes[index].stations.map { |station| station.name })
@@ -404,7 +500,7 @@ class Main
   end
 
   def add_station_to_current_route(route_index)
-    system 'clear'
+    clear
     header 'Добавление станции в маршрут'
 
     station_index = choose_station(nil, 'Выберите станцию для добавления в маршрут')
@@ -414,14 +510,14 @@ class Main
     station = stations[station_index]
 
     route.add station
-    system 'clear'
+    clear
     continue "Станция \"#{station.name}\" добавлена к маршруту \"#{route.name}\""
 
     route_menu route_index
   end
 
   def add_train_to_current_route(route_index)
-    system 'clear'
+    clear
     header 'Добавление маршрута к поезду'
     train_index = choose_train
     return if process_menu_empty train_index, :routes_menu, 'Список поездов пуст'
@@ -449,7 +545,7 @@ class Main
 
   def process_menu_empty(index, callback, header = 'список пуст')
     if index == -1
-      system 'clear'
+      clear
       continue header
       send callback
       return true
@@ -458,36 +554,10 @@ class Main
     false
   end
 
-  def header(str = '')
-    header_decorator(str)
-    puts ''
-  end
-
-  def subheader(str = '')
-    header_decorator(str, '-')
-  end
-
-  def header_decorator(str, line_char = '=')
-    line = ''
-    str.length.times { line += '=' }
-    puts str, line
-  end
-
-  def continue(str = '')
-    header str unless str.empty?
-    puts '', 'для продолжения нажмите Enter'
-    gets
-  end
-
-  def exit
-    system 'clear'
-    abort 'Досвидули!'
-  end
-
   def seeds
     Seeds.new.generate(routes, stations, trains)
     @has_seeds = true
-    system 'clear'
+    clear
     continue 'Демо-данные сгенерированы'
     main_menu
   end

@@ -7,7 +7,7 @@ class CargoTrain < Train
     @type = 'Грузовой'
   end
 
-  def add_wagon(max_volume)
-    super(CargoWagon.new(max_volume))
+  def add_wagon(max_volume, loaded = 0)
+    super(CargoWagon.new(max_volume, loaded))
   end
 end

@@ -5,14 +5,17 @@ require_relative './passenger_train'
 
 class Seeds
   NAMES = ['Краснодар', 'Раменское', 'Кратово', 'Люберцы', 'Выхино', 'Новая', 'Сортировочная', 'Москва Казанская']
-  CARGO_TRAINS = 5
-  PASSENGER_TRAINS = 10
+  CARGO_TRAINS = 2
+  PASSENGER_TRAINS = 3
 
-  PASSENGER_WAGONS_MIN = 10
-  PASSENGER_WAGONS_MAX = 15
+  PASSENGER_WAGONS_MIN = 1
+  PASSENGER_WAGONS_MAX = 5
+  PASSENGER_WAGON_AMOUNT_MAX = 50
 
-  CARGO_WAGONS_MIN = 0
-  CARGO_WAGONS_MAX = 500
+  CARGO_WAGONS_MIN = 1
+  CARGO_WAGONS_MAX = 10
+  CARGO_WAGON_VOLUME_MAX = 10000
+
 
   def generate(routes = [], stations = [], trains = [])
     generate_stations(stations)
@@ -21,7 +24,7 @@ class Seeds
     attach_routes(trains, routes)
 
     {
-      routres: routes,
+      routes: routes,
       stations: stations,
       trains: trains
     }
@@ -38,15 +41,25 @@ class Seeds
 
   def generate_cargo_train
     train = CargoTrain.new(generate_train_number)
-    amount = Random.rand(CARGO_WAGONS_MIN...CARGO_WAGONS_MAX)
-    amount.times { train.add_wagon() }
+    wagons_amount = rand(CARGO_WAGONS_MIN...CARGO_WAGONS_MAX)
+
+    wagons_amount.times do
+      loaded = rand(CARGO_WAGON_VOLUME_MAX)
+      train.add_wagon(CARGO_WAGON_VOLUME_MAX, loaded)
+    end
 
     train
   end
 
   def generate_passenger_train
     train = PassengerTrain.new(generate_train_number)
-    train.add_wagon(Random.rand(PASSENGER_WAGONS_MIN...PASSENGER_WAGONS_MAX))
+    wagons_amount = rand(PASSENGER_WAGONS_MIN...PASSENGER_WAGONS_MAX)
+
+    wagons_amount.times do
+      taken = rand(PASSENGER_WAGON_AMOUNT_MAX)
+      train.add_wagon(PASSENGER_WAGON_AMOUNT_MAX, taken)
+    end
+
     train
   end
 
@@ -63,10 +76,10 @@ class Seeds
 
   def attach_routes(trains, routes)
     trains.each do |train|
-      case train.class
-      when CargoTrain
+      case train.class.to_s
+      when 'CargoTrain'
         train.route = routes[0]
-      when PassengerTrain
+      when 'PassengerTrain'
         train.route = routes[1]
       end
     end

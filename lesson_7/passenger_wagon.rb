@@ -1,12 +1,12 @@
 require_relative 'wagon'
 
 class PassengerWagon < Wagon
-  attr_reader :taken
+  attr_reader :taken, :amount
 
-  def initialize(amount)
+  def initialize(amount, taken = 0)
     super()
     @amount = amount
-    @taken = 0
+    @taken = taken
     @type = 'Пассажирский'
   end
 
