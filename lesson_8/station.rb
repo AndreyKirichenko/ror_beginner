@@ -27,36 +27,32 @@ class Station
   end
 
   def self.all
-    return @@instances
+    @@instances
   end
 
   def arrive(train)
-    unless @trains.include? train
-      @trains << train
-    end
+    @trains << train unless @trains.include? train
   end
 
   def departure(train)
-    if @trains.include? train
-      @trains.delete_if { |current_train| current_train == train }
-    end
+    @trains.delete_if { |current_train| current_train == train }
   end
 
   def trains(type = '')
     case type
-      when 'Пассажирский'
-        return @trains.select { |train| train.instance_of? PassengerTrain}
+    when 'Пассажирский'
+      @trains.select { |train| train.instance_of? PassengerTrain }
 
-      when 'Грузовой'
-        return @trains.select { |train| train.instance_of? CargoTrain}
+    when 'Грузовой'
+      @trains.select { |train| train.instance_of? CargoTrain }
 
-      else
-        return @trains
+    else
+      @trains
     end
   end
 
   def process_trains
-    @trains.each { |train| yield(train)}
+    @trains.each { |train| yield(train) }
   end
 
   protected

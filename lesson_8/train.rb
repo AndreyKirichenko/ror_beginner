@@ -107,7 +107,11 @@ class Train
   def validate_number!
     raise 'Вы не ввели номер поезда' if @number.empty?
     raise 'Недопустимое название поезда' if number !~ NUMBER_FORMAT
-    raise "Поезд с номером #{@number} уже существует" unless self.class.find(@number).nil?
+
+    unless self.class.find(@number).nil?
+      raise "Поезд с номером #{@number} уже существует"
+    end
+
     true
   end
 

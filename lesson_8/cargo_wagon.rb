@@ -10,11 +10,8 @@ class CargoWagon < Wagon
   end
 
   def load(volume)
-    if volume >= 0 && (@loaded + volume) <= @max_volume
-      @loaded += volume
-    else
-      raise 'Вагон не должен быть перегружен'
-    end
+    raise 'Вагон не должен быть перегружен' unless fit_volume?(volume)
+    @loaded += volume
   end
 
   def unload
@@ -23,5 +20,11 @@ class CargoWagon < Wagon
 
   def available
     @max_volume - @loaded
+  end
+
+  private
+
+  def fit_volume?(volume)
+    volume >= 0 && (@loaded + volume) <= @max_volume
   end
 end

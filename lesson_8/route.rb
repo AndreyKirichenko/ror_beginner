@@ -11,15 +11,15 @@ class Route
     instance_count
     @first_station = first_station
     @last_station = last_station
-    @intermediate_stations = []
+    @intermediate = []
   end
 
   def add(station)
-    intermediate_stations.push(station).uniq! { |station| station.object_id }
+    @intermediate.push(station).uniq!(&:object_id)
   end
 
   def remove_by_name(station_name)
-    intermediate_stations.delete_if { |station| station.name == station_name}
+    @intermediate.delete_if { |station| station.name == station_name }
   end
 
   def show
@@ -27,7 +27,7 @@ class Route
   end
 
   def stations
-    [first_station, last_station].insert(1, *intermediate_stations).uniq { |station| station.object_id }
+    [first_station, last_station].insert(1, *@intermediate).uniq(&:object_id)
   end
 
   def name
@@ -36,6 +36,5 @@ class Route
 
   protected
 
-  attr_accessor :intermediate_stations
-
+  attr_accessor :intermediate
 end

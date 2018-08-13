@@ -5,7 +5,5 @@ class Wagon
 
   attr_accessor :type
 
-  def initialize
-
-  end
+  def initialize; end
 end

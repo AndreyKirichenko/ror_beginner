@@ -11,7 +11,7 @@ class Menu
       ask list
     end
 
-    return inputed_index
+    inputed_index
   end
 
   def show(list)

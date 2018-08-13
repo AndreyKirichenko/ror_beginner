@@ -8,7 +8,7 @@ module TerminalHelpers
     puts ''
   end
 
-  def subheader(str = '')
+  def sub_header(str = '')
     header_decorator(str, '-')
   end
 
@@ -25,7 +25,7 @@ module TerminalHelpers
   end
 
   def exit
-    system 'clear'
+    clear
     abort 'Досвидули!'
   end
 end

@@ -4,7 +4,9 @@ require_relative './cargo_train'
 require_relative './passenger_train'
 
 class Seeds
-  NAMES = ['Краснодар', 'Раменское', 'Кратово', 'Люберцы', 'Выхино', 'Новая', 'Сортировочная', 'Москва Казанская']
+  NAMES = %w[Краснодар Раменское Кратово Люберцы Выхино Новая Сортировочная
+             Москва\ Казанская].freeze
+
   CARGO_TRAINS = 2
   PASSENGER_TRAINS = 3
 
@@ -14,8 +16,7 @@ class Seeds
 
   CARGO_WAGONS_MIN = 1
   CARGO_WAGONS_MAX = 10
-  CARGO_WAGON_VOLUME_MAX = 10000
-
+  CARGO_WAGON_VOLUME_MAX = 10_000
 
   def generate(routes = [], stations = [], trains = [])
     generate_stations(stations)
@@ -36,7 +37,7 @@ class Seeds
 
   def generate_trains(trains)
     CARGO_TRAINS.times { trains << generate_cargo_train }
-    PASSENGER_TRAINS.times { trains << generate_passenger_train}
+    PASSENGER_TRAINS.times { trains << generate_passenger_train }
   end
 
   def generate_cargo_train
@@ -67,11 +68,7 @@ class Seeds
     routes << Route.new(stations[0], stations.last)
     routes << Route.new(stations[1], stations.last)
 
-    routes[1].add stations[2]
-    routes[1].add stations[3]
-    routes[1].add stations[4]
-    routes[1].add stations[5]
-    routes[1].add stations[6]
+    (2..6).to_a.each { |index| routes[1].add(stations[index]) }
   end
 
   def attach_routes(trains, routes)
